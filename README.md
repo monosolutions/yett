@@ -159,6 +159,17 @@ npm run dev
 npm run build
 ```
 
+### Deploying / Publishing
+Publishing the yett would just be running these steps:
+* Pull the latest `master`
+* `npm version major|minor|patch` to bump the version to a new one ( according to [SemVer](http://semver.org/) versioning )
+* `npm publish` to publish it to Github package registry
+* `git push origin master` to push the commit that updates the version
+
+### Versioning
+
+We can maybe use [SemVer](http://semver.org/) for versioning. For the versions available, see the [link to tags on this repository](/tags).
+
 ## Browser compatibility
 
 |                        |                    `<script>`                   |     `<script type="javascript/blocked">`    |      `document.createElement('script')`     |

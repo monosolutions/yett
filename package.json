@@ -27,7 +27,8 @@
     "test:whitelist": "WHITELIST=1 karma start --single-run --browsers ChromeHeadless,FirefoxHeadless,Safari karma.conf.js",
     "test": "npm run test:blacklist && npm run test:whitelist",
     "lint": "eslint src",
-    "start": "npm run build && npm run test"
+    "start": "npm run build && npm run test",
+    "prepublishOnly": "npm run build"
   },
   "author": "Julien Elbaz",
   "contributors": [

@@ -1,7 +1,8 @@
 import {
     patterns,
     backupScripts,
-    TYPE_ATTRIBUTE
+    TYPE_ATTRIBUTE,
+    UNBLOCK_INLINESCRIPTS
 } from './variables'
 
 import {
@@ -81,5 +82,15 @@ export const unblock = function(...scriptUrlsOrRegexes) {
     // Disconnect the observer if the blacklist is empty for performance reasons
     if(patterns.blacklist && patterns.blacklist.length < 1) {
         observer.disconnect()
+    }
+
+    //If we have javascript/inlineblocked inline scripts ( without a src ) unblock those as well.
+    if( UNBLOCK_INLINESCRIPTS ) {
+        document.querySelectorAll('script[type="javascript/inlineblocked"]').forEach( script => {
+            const newScript = document.createElement('script');
+            newScript.type = 'text/javascript';
+            newScript.innerText = script.innerText;
+            script.parentNode.replaceChild(newScript, script);
+        });
     }
 }

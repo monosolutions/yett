@@ -11,6 +11,7 @@
             /inline\.js$/,
             /dynamic\.js$/
         ]
+        YETT_UNBLOCKINLINE = true;
     </script>
     <script src="./lib/yett.min.js"></script>
     <script src="inline.js" type="javascript/blocked"></script>
@@ -67,6 +68,8 @@
             </p>
         </section>
     </main>
-
+    <script type="javascript/inlineblocked">
+        console.log('inline script is free!');
+    </script>
 </body>
 </html>
