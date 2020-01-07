@@ -1,5 +1,5 @@
 {
-  "name": "yett",
+  "name": "@monosolutions/yett",
   "version": "0.1.12",
   "description": "A small library that can prevent other scripts from executing.",
   "main": "dist/yett.min.js",
@@ -13,10 +13,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/snipsco/yett"
+    "url": "https://github.com/monosolutions/yett"
   },
   "bugs": {
-    "url": "https://github.com/snipsco/yett/issues"
+    "url": "https://github.com/monosolutions/yett/issues"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "scripts": {
     "build": "npm run lint && rollup -c && rollup -c --o docs/lib/yett.min.js && rollup -c --o test/scripts/yett.min.js",
