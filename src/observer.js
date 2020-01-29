@@ -8,7 +8,7 @@ export const observer = new MutationObserver(mutations => {
         for(let i = 0; i < addedNodes.length; i++) {
             const node = addedNodes[i]
             // For each added script tag
-            if(node.nodeType === 1 && node.tagName === 'SCRIPT') {
+            if(node.nodeType === 1 && node.tagName === 'SCRIPT' && !node.hasAttribute('data-noblock')) {
                 const src = node.src
                 const type = node.type
                 // If the src is inside the blacklist and is not inside the whitelist
