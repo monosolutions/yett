@@ -20,7 +20,7 @@ document.createElement = function(...args) {
                     return scriptElt.getAttribute('src')
                 },
                 set(value) {
-                    if(isOnBlacklist(value, scriptElt.type)) {
+                    if(isOnBlacklist(value, scriptElt.type) && !scriptElt.hasAttribute('data-noblock')) {
                         originalSetAttribute('type', TYPE_ATTRIBUTE)
                     }
                     originalSetAttribute('src', value)
@@ -30,7 +30,7 @@ document.createElement = function(...args) {
             'type': {
                 set(value) {
                     const typeValue =
-                        isOnBlacklist(scriptElt.src, scriptElt.type) ?
+                        isOnBlacklist(scriptElt.src, scriptElt.type) && !scriptElt.hasAttribute('data-noblock') ?
                             TYPE_ATTRIBUTE :
                         value
                     originalSetAttribute('type', typeValue)
