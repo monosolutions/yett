@@ -10,7 +10,7 @@ export const isOnBlacklist = (src, type) => {
     );
 
 
-    if(onBlacklist && !loggedBlacklist.includes(src)){
+    if(onBlacklist && loggedBlacklist.indexOf(src) === -1){
         loggedBlacklist.push(src);
         console.info(`Script src '${src}' is blocked`);
     }

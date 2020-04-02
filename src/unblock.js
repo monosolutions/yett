@@ -86,7 +86,7 @@ export const unblock = function(...scriptUrlsOrRegexes) {
 
     //If we have javascript/inlineblocked inline scripts ( without a src ) unblock those as well.
     if( UNBLOCK_INLINESCRIPTS ) {
-        document.querySelectorAll('script[type="javascript/inlineblocked"]').forEach( script => {
+        [...document.querySelectorAll('script[type="javascript/inlineblocked"]')].forEach( script => {
             const newScript = document.createElement('script');
             newScript.type = 'text/javascript';
             newScript.innerText = script.innerText;
