@@ -32,9 +32,8 @@ export const unblock = function(...scriptUrlsOrRegexes) {
             ))
         }
         if(patterns.whitelist) {
-            patterns.whitelist = [
-                ...patterns.whitelist,
-                ...scriptUrlsOrRegexes
+            patterns.whitelist = patterns.whitelist.concat(
+                scriptUrlsOrRegexes
                     .map(urlOrRegexp => {
                         if(typeof urlOrRegexp === 'string') {
                             const escapedUrl = urlOrRegexp.replace(URL_REPLACER_REGEXP, '\\$&')
@@ -50,7 +49,7 @@ export const unblock = function(...scriptUrlsOrRegexes) {
                         return null
                     })
                     .filter(Boolean)
-            ]
+            )
         }
     }
 
@@ -68,16 +67,17 @@ export const unblock = function(...scriptUrlsOrRegexes) {
 
     // Exclude 'whitelisted' scripts from the blacklist and append them to <head>
     let indexOffset = 0;
-    [...backupScripts.blacklisted].forEach((script, index) => {
+    for(let i = 0; i < backupScripts.blacklisted.length; i++ ){
+        const script = backupScripts.blacklisted[i];
         if(willBeUnblocked(script)) {
             const scriptNode = document.createElement('script')
             scriptNode.setAttribute('src', script.src)
             scriptNode.setAttribute('type', 'application/javascript')
             document.head.appendChild(scriptNode)
-            backupScripts.blacklisted.splice(index - indexOffset, 1)
+            backupScripts.blacklisted.splice(i - indexOffset, 1)
             indexOffset++
         }
-    })
+    }
 
     // Disconnect the observer if the blacklist is empty for performance reasons
     if(patterns.blacklist && patterns.blacklist.length < 1) {
@@ -86,11 +86,13 @@ export const unblock = function(...scriptUrlsOrRegexes) {
 
     //If we have javascript/inlineblocked inline scripts ( without a src ) unblock those as well.
     if( UNBLOCK_INLINESCRIPTS ) {
-        [...document.querySelectorAll('script[type="javascript/inlineblocked"]')].forEach( script => {
+        const scripts = document.querySelectorAll('script[type="javascript/inlineblocked"]');
+        for(let i = 0; i < scripts.length; i++ ){
+            const script = scripts[i];
             const newScript = document.createElement('script');
             newScript.type = 'text/javascript';
             newScript.innerText = script.innerText;
             script.parentNode.replaceChild(newScript, script);
-        });
+        }
     }
 }
