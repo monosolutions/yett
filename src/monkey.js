@@ -6,12 +6,15 @@ const createElementBackup = document.createElement
 // Monkey patch the createElement method to prevent dynamic scripts from executing
 document.createElement = function(...args) {
     // If this is not a script tag, bypass
-    if(args[0].toLowerCase() !== 'script')
+    // if(args[0].toLowerCase() !== 'script')
+    const nodeType = args[0].toLowerCase();
+    if(['script', 'iframe'].indexOf(nodeType) === -1 )
         return createElementBackup.bind(document)(...args)
 
     const scriptElt = createElementBackup.bind(document)(...args)
     const originalSetAttribute = scriptElt.setAttribute.bind(scriptElt)
 
+    const type = nodeType === 'script' ? scriptElt.type : 'text/javascript';
     // Define getters / setters to ensure that the script type is properly set
     try {
         Object.defineProperties(scriptElt, {
@@ -20,7 +23,8 @@ document.createElement = function(...args) {
                     return scriptElt.getAttribute('src')
                 },
                 set(value) {
-                    if(isOnBlacklist(value, scriptElt.type) && !scriptElt.hasAttribute('data-noblock')) {
+
+                    if(isOnBlacklist(value, type) && !scriptElt.hasAttribute('data-noblock')) {
                         originalSetAttribute('type', TYPE_ATTRIBUTE)
                     }
                     originalSetAttribute('src', value)
@@ -30,7 +34,7 @@ document.createElement = function(...args) {
             'type': {
                 set(value) {
                     const typeValue =
-                        isOnBlacklist(scriptElt.src, scriptElt.type) && !scriptElt.hasAttribute('data-noblock') ?
+                        isOnBlacklist(scriptElt.src, type) && !scriptElt.hasAttribute('data-noblock') ?
                             TYPE_ATTRIBUTE :
                         value
                     originalSetAttribute('type', typeValue)
@@ -44,7 +48,11 @@ document.createElement = function(...args) {
             if(name === 'type' || name === 'src')
                 scriptElt[name] = value
             else
-                HTMLScriptElement.prototype.setAttribute.call(scriptElt, name, value)
+                if(type === 'script'){
+                    HTMLScriptElement.prototype.setAttribute.call(scriptElt, name, value)
+                } else {
+                    HTMLIFrameElement.prototype.setAttribute.call(scriptElt, name, value)
+                }
         }
     } catch (error) {
         console.warn(

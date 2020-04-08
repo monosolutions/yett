@@ -10,3 +10,6 @@ export const patterns = {
 export const backupScripts = {
     blacklisted: []
 }
+export const backupIframes = {
+    blacklisted: []
+}

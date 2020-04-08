@@ -1,6 +1,7 @@
 import {
     patterns,
     backupScripts,
+    backupIframes,
     TYPE_ATTRIBUTE,
     UNBLOCK_INLINESCRIPTS
 } from './variables'
@@ -66,6 +67,17 @@ export const unblock = function(...scriptUrlsOrRegexes) {
         }
     }
 
+    // Parse existing iframe tags with a marked type
+    const iframeTags = document.querySelectorAll(`iframe[type="${TYPE_ATTRIBUTE}"]`)
+    for(let i = 0; i < iframeTags.length; i++) {
+        const script = iframeTags[i]
+        if(willBeUnblocked(script)) {
+            script.type = 'application/javascript'
+            backupIframes.blacklisted.push(script)
+            script.parentElement.removeChild(script)
+        }
+    }
+
     // Exclude 'whitelisted' scripts from the blacklist and append them to <head>
     let indexOffset = 0;
     [...backupScripts.blacklisted].forEach((script, index) => {
@@ -79,6 +91,17 @@ export const unblock = function(...scriptUrlsOrRegexes) {
         }
     })
 
+    // let iframeIndexOffset = 0;
+    // [...backupIframes.blacklisted].forEach((iframe, index) => {
+    //     if(willBeUnblocked(iframe)) {
+    //         const iframeNode = document.createElement('iframe')
+    //         iframeNode.setAttribute('src', iframe.src)
+    //         document.head.appendChild(iframeNode)
+    //         backupIframes.blacklisted.splice(index - iframeIndexOffset, 1)
+    //         iframeIndexOffset++
+    //     }
+    // })
+
     // Disconnect the observer if the blacklist is empty for performance reasons
     if(patterns.blacklist && patterns.blacklist.length < 1) {
         observer.disconnect()
@@ -91,6 +114,12 @@ export const unblock = function(...scriptUrlsOrRegexes) {
             newScript.type = 'text/javascript';
             newScript.innerText = script.innerText;
             script.parentNode.replaceChild(newScript, script);
+        });
+
+        [...document.querySelectorAll('iframe[data-blocked-src]')].forEach( iframe => {
+            const newIframe = document.createElement('iframe');
+            newIframe.src = iframe.getAttribute('data-blocked-src');
+            iframe.parentNode.replaceChild(newIframe, iframe);
         });
     }
 }

@@ -1,4 +1,4 @@
-import { backupScripts, TYPE_ATTRIBUTE } from './variables'
+import { backupScripts, backupIframes, TYPE_ATTRIBUTE } from './variables'
 import { isOnBlacklist } from './checks'
 
 // Setup a mutation observer to track DOM insertion
@@ -8,13 +8,19 @@ export const observer = new MutationObserver(mutations => {
         for(let i = 0; i < addedNodes.length; i++) {
             const node = addedNodes[i]
             // For each added script tag
-            if(node.nodeType === 1 && node.tagName === 'SCRIPT' && !node.hasAttribute('data-noblock')) {
+
+
+            if(node.nodeType === 1 && [ 'SCRIPT', 'IFRAME' ].indexOf(node.tagName) > -1 && !node.hasAttribute('data-noblock')) {
                 const src = node.src
-                const type = node.type
+                const type = node.tagName === 'SCRIPT' ? node.type : 'text/javascript';
                 // If the src is inside the blacklist and is not inside the whitelist
                 if(isOnBlacklist(src, type)) {
                     // We backup a copy of the script node
-                    backupScripts.blacklisted.push(node.cloneNode())
+                    if(node.tagName === 'SCRIPT'){
+                        backupScripts.blacklisted.push(node.cloneNode())
+                    } else {
+                        backupIframes.blacklisted.push(node.cloneNode())
+                    }
 
                     // Blocks inline script execution in Safari & Chrome
                     node.type = TYPE_ATTRIBUTE
@@ -29,7 +35,12 @@ export const observer = new MutationObserver(mutations => {
                     node.addEventListener('beforescriptexecute', beforeScriptExecuteListener)
 
                     // Remove the node from the DOM
-                    node.parentElement && node.parentElement.removeChild(node)
+                    if(node.tagName === 'SCRIPT'){
+                        node.parentElement && node.parentElement.removeChild(node)
+                    } else {
+                        node.setAttribute('data-blocked-src', node.src);
+                        node.setAttribute('src', 'about:blank');
+                    }
                 }
             }
         }
