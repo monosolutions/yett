@@ -66,16 +66,15 @@ export const unblock = function(...scriptUrlsOrRegexes) {
     }
 
     // Exclude 'whitelisted' scripts from the blacklist and append them to <head>
-    let indexOffset = 0;
-    for(let i = 0; i < backupScripts.blacklisted.length; i++ ){
+    //Looping array in reverse so that splice doesn't mess up indexes
+    for(let i = backupScripts.blacklisted.length - 1; i >= 0; --i) {
         const script = backupScripts.blacklisted[i];
         if(willBeUnblocked(script)) {
             const scriptNode = document.createElement('script')
             scriptNode.setAttribute('src', script.src)
             scriptNode.setAttribute('type', 'application/javascript')
             document.head.appendChild(scriptNode)
-            backupScripts.blacklisted.splice(i - indexOffset, 1)
-            indexOffset++
+            backupScripts.blacklisted.splice(i, 1)
         }
     }
 
